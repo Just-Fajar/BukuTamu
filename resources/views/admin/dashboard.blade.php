@@ -132,9 +132,6 @@
             color: #f59e0b;
         }
 
-        .stat-card.info .number {
-            color: #3b82f6;
-        }
 
         .charts-grid {
             display: grid;
