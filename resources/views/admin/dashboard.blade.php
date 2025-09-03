@@ -627,9 +627,33 @@
                     <!-- Filter TANGGAL -->
                     <div style="display:flex; gap:8px; align-items:center;">
                         <input type="date" class="filter-select" id="dateFilter">
-                        <button type="button" id="clearDateFilter" class="btn-reset">Semua Tanggal</button>
+                        <button type="button" id="todayFilter" class="btn-reset">Hari Ini</button>
                     </div>
                 </div>
+
+                <script>
+                    // Set today's date in YYYY-MM-DD format
+                    function setTodayDate() {
+                        const today = new Date();
+                        const year = today.getFullYear();
+                        const month = String(today.getMonth() + 1).padStart(2, '0');
+                        const day = String(today.getDate()).padStart(2, '0');
+                        const dateStr = `${year}-${month}-${day}`;
+                        
+                        const dateFilter = document.getElementById('dateFilter');
+                        dateFilter.value = dateStr;
+                        
+                        // Trigger the change event to update the data
+                        const event = new Event('change');
+                        dateFilter.dispatchEvent(event);
+                    }
+
+                    // Set initial date to today when page loads
+                    document.addEventListener('DOMContentLoaded', setTodayDate);
+                    
+                    // Add click handler for today button
+                    document.getElementById('todayFilter').addEventListener('click', setTodayDate);
+                </script>
             </div>
 
             <div id="tableLoading" class="loading">
