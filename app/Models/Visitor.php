@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;   // <-- tambahkan
+use Illuminate\Support\Facades\Storage;
 
 class Visitor extends Model
 {
@@ -22,9 +22,13 @@ class Visitor extends Model
 
     public function getPhotoUrlAttribute()
     {
-        return $this->photo_path
-            ? Storage::disk('public')->url($this->photo_path) // hasil: /storage/...
-            : null;
+        if (!$this->photo_path) {
+            return null;
+        }
+        
+        // Pastikan storage link sudah dibuat
+        // php artisan storage:link
+        return asset('storage/' . $this->photo_path);
     }
 
     const PURPOSE_OPTIONS = [

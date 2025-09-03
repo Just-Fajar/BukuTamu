@@ -132,6 +132,9 @@
             color: #f59e0b;
         }
 
+        .stat-card.info .number {
+            color: #3b82f6;
+        }
 
         .charts-grid {
             display: grid;
@@ -529,6 +532,14 @@
         /* Biar sel tetap rapi saat tinggi bertambah */
         .data-table td{ vertical-align: middle; }
 
+        .semester-select {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+}
+
     </style>
 </head>
 <body>
@@ -563,6 +574,17 @@
                 <div class="number" id="monthVisitors">-</div>
                 <div class="label">Pengunjung bulan ini</div>
             </div>
+            <div class="stat-card semester">
+              <h3>Semester</h3>
+              <div class="number" id="semesterVisitors">-</div>
+              <div class="label">
+                <select id="semesterSelect">
+                  <option value="1">Semester 1 (Jan–Jun)</option>
+                  <option value="2">Semester 2 (Jul–Des)</option>
+                </select>
+              </div>
+            </div>
+
             <div class="stat-card info">
                 <h3>Rata-rata</h3>
                 <div class="number" id="avgVisitors">-</div>
@@ -804,10 +826,10 @@ async function loadStatistics() {
     const qs = new URLSearchParams();
 
     if (currentFilters.date) {
-      qs.set('date', String(currentFilters.date));            // YYYY-MM-DD atau dd/MM/yyyy
+      qs.set('date', String(currentFilters.date)); // YYYY-MM-DD
     } else if (currentFilters.month && currentFilters.year) {
-      qs.set('month', String(currentFilters.month));          // 1..12
-      qs.set('year', String(currentFilters.year));            // 4 digit
+      qs.set('month', String(currentFilters.month));
+      qs.set('year', String(currentFilters.year));
     }
 
     const qstr = qs.toString();
@@ -828,7 +850,7 @@ async function loadStatistics() {
       monthly_stats: Array.isArray(raw.monthly_stats) ? raw.monthly_stats : []
     };
 
-    // 3) Angka default dari API (akan ditimpa jika ada filter)
+    // 3) Angka default
     let totalCard = stats.total;
     let todayCard = stats.today;
     let monthCard = stats.this_month;
@@ -840,14 +862,6 @@ async function loadStatistics() {
     const lblWarning = document.querySelector('.stat-card.warning .label');
     const lblInfo    = document.querySelector('.stat-card.info .label');
 
-    const setDefaultLabels = () => {
-      if (lblPrimary) lblPrimary.textContent = 'Semua waktu';
-      if (lblSuccess) lblSuccess.textContent = 'Pengunjung hari ini';
-      if (lblWarning) lblWarning.textContent = 'Pengunjung bulan ini';
-      if (lblInfo)    lblInfo.textContent    = 'Per hari';
-    };
-
-    // Helper: parse dd/MM/yyyy atau yyyy-MM-dd
     const parsePickedDate = (v) => {
       if (!v) return null;
       if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
@@ -863,79 +877,86 @@ async function loadStatistics() {
     };
 
     // 5) Override berdasarkan filter
-const now = new Date();
+    const now = new Date();
 
-// a) TANPA FILTER → kartu “Total” = total TAHUN berjalan (dari monthly_stats)
-if (!currentFilters.date && !currentFilters.month && !currentFilters.year) {
-  const yNow = now.getFullYear();
-  const totalYear = sumYearCount(stats, yNow);
-  if (totalYear || totalYear === 0) totalCard = totalYear;
+    // a) TANPA FILTER
+    if (!currentFilters.date && !currentFilters.month && !currentFilters.year) {
+      const yNow = now.getFullYear();
+      const totalYear = sumYearCount(stats, yNow);
+      if (totalYear || totalYear === 0) totalCard = totalYear;
 
-  if (lblPrimary) lblPrimary.textContent = `Tahun ${yNow}`;
-  if (lblSuccess) lblSuccess.textContent = stats.today > 0 ? 'Pengunjung hari ini' : 'Belum ada pengunjung hari ini';
-  if (lblWarning) lblWarning.textContent = totalYear > 0 ? `Pengunjung bulan ${now.toLocaleString('id-ID', { month: 'long' })}` : `Belum ada pengunjung bulan ${now.toLocaleString('id-ID', { month: 'long' })}`;
-  if (lblInfo) lblInfo.textContent = totalCard > 0 ? 'Per hari' : 'Rata-rata per hari';
-}
+      if (lblPrimary) lblPrimary.textContent = `Tahun ${yNow}`;
+      if (lblSuccess) lblSuccess.textContent = stats.today > 0 ? 'Pengunjung hari ini' : 'Belum ada pengunjung hari ini';
+      if (lblWarning) lblWarning.textContent = totalYear > 0 ? 
+        `Pengunjung bulan ${now.toLocaleString('id-ID', { month: 'long' })}` : 
+        `Belum ada pengunjung bulan ${now.toLocaleString('id-ID', { month: 'long' })}`;
+      if (lblInfo) lblInfo.textContent = totalCard > 0 ? 'Per hari' : 'Rata-rata per hari';
+    }
 
-// b) FILTER TANGGAL
-if (currentFilters.date) {
-  const picked = parsePickedDate(currentFilters.date);
-  if (picked) {
-    const y = picked.getFullYear();
-    const m = picked.getMonth() + 1;
+    // b) FILTER TANGGAL
+    if (currentFilters.date) {
+      const picked = parsePickedDate(currentFilters.date);
+      if (picked) {
+        const y = picked.getFullYear();
+        const m = picked.getMonth() + 1;
 
-    let yearStats = await fetchYearStats(y);
-    if (!yearStats) yearStats = stats;
+        let yearStats = await fetchYearStats(y);
+        if (!yearStats) yearStats = stats;
 
-    totalCard = sumYearCount(yearStats, y);
-    const mTot = monthCountFrom(yearStats, m, y) || 0;
-    monthCard = mTot;
+        totalCard = sumYearCount(yearStats, y);
+        const mTot = monthCountFrom(yearStats, m, y) || 0;
+        monthCard = mTot;
 
-    const isSameDate = picked.toDateString() === now.toDateString();
-    todayCard = isSameDate ? Number(stats.today ?? 0) : 0;
-    avgCard = mTot > 0 ? Math.round(mTot / daysInMonth(y, m)) : 0;
+        const isSameDate = picked.toDateString() === now.toDateString();
+        todayCard = isSameDate ? Number(stats.today ?? 0) : 0;
+        avgCard = mTot > 0 ? Math.round(mTot / daysInMonth(y, m)) : 0;
 
-    // Label
-    if (lblPrimary) lblPrimary.textContent = `Tahun ${y}`;
-    if (lblSuccess) lblSuccess.textContent = (isSameDate && todayCard > 0) ? 'Pengunjung hari ini' : 'Belum ada pengunjung';
-    if (lblWarning) lblWarning.textContent = mTot > 0 ? `Pengunjung bulan ${picked.toLocaleString('id-ID', { month: 'long' })}` : `Belum ada pengunjung bulan ${picked.toLocaleString('id-ID', { month: 'long' })}`;
-    if (lblInfo) lblInfo.textContent = avgCard > 0 ? 'Rata-rata per hari (bulan terpilih)' : 'Belum ada rata-rata';
-  }
-}
+        if (lblPrimary) lblPrimary.textContent = `Tahun ${y}`;
+        if (lblSuccess) lblSuccess.textContent = (isSameDate && todayCard > 0) ? 
+          'Pengunjung hari ini' : 'Belum ada pengunjung';
+        if (lblWarning) lblWarning.textContent = mTot > 0 ? 
+          `Pengunjung bulan ${picked.toLocaleString('id-ID', { month: 'long' })}` : 
+          `Belum ada pengunjung bulan ${picked.toLocaleString('id-ID', { month: 'long' })}`;
+        if (lblInfo) lblInfo.textContent = avgCard > 0 ? 
+          'Rata-rata per hari (bulan terpilih)' : 'Belum ada rata-rata';
+      }
+    }
 
-// c) FILTER BULAN + TAHUN
-else if (currentFilters.month && currentFilters.year) {
-  const selMonth = Number(currentFilters.month);
-  const selYear  = Number(currentFilters.year);
+    // c) FILTER BULAN + TAHUN
+    else if (currentFilters.month && currentFilters.year) {
+      const selMonth = Number(currentFilters.month);
+      const selYear  = Number(currentFilters.year);
 
-  let yearStats = await fetchYearStats(selYear);
-  if (!yearStats) yearStats = stats;
+      let yearStats = await fetchYearStats(selYear);
+      if (!yearStats) yearStats = stats;
 
-  totalCard = sumYearCount(yearStats, selYear);
-  const mTot = monthCountFrom(yearStats, selMonth, selYear) || 0;
-  monthCard = mTot;
+      totalCard = sumYearCount(yearStats, selYear);
+      const mTot = monthCountFrom(yearStats, selMonth, selYear) || 0;
+      monthCard = mTot;
 
-  const isCurrentMonth = (now.getFullYear() === selYear && now.getMonth() + 1 === selMonth);
-  todayCard = isCurrentMonth ? Number(stats.today ?? 0) : 0;
-  avgCard = mTot > 0 ? Math.round(mTot / daysInMonth(selYear, selMonth)) : 0;
+      const isCurrentMonth = (now.getFullYear() === selYear && now.getMonth() + 1 === selMonth);
+      todayCard = isCurrentMonth ? Number(stats.today ?? 0) : 0;
+      avgCard = mTot > 0 ? Math.round(mTot / daysInMonth(selYear, selMonth)) : 0;
 
-  const monthName = new Date(selYear, selMonth - 1).toLocaleString('id-ID', { month: 'long' });
+      const monthName = new Date(selYear, selMonth - 1).toLocaleString('id-ID', { month: 'long' });
 
-  if (lblPrimary) lblPrimary.textContent = `Tahun ${selYear}`;
-  if (lblSuccess) lblSuccess.textContent = (isCurrentMonth && todayCard > 0) ? 'Pengunjung hari ini' : 'Belum ada pengunjung hari ini';
-  if (lblWarning) lblWarning.textContent = mTot > 0 ? `Pengunjung bulan ${monthName}` : `Belum ada pengunjung bulan ${monthName}`;
-  if (lblInfo) lblInfo.textContent = avgCard > 0 ? 'Rata-rata per hari (bulan terpilih)' : 'Belum ada rata-rata';
-}
+      if (lblPrimary) lblPrimary.textContent = `Tahun ${selYear}`;
+      if (lblSuccess) lblSuccess.textContent = (isCurrentMonth && todayCard > 0) ? 
+        'Pengunjung hari ini' : 'Belum ada pengunjung hari ini';
+      if (lblWarning) lblWarning.textContent = mTot > 0 ? 
+        `Pengunjung bulan ${monthName}` : `Belum ada pengunjung bulan ${monthName}`;
+      if (lblInfo) lblInfo.textContent = avgCard > 0 ? 
+        'Rata-rata per hari (bulan terpilih)' : 'Belum ada rata-rata';
+    }
 
-    // 6) Tulis ke DOM
+    // 6) Update DOM kartu utama
     document.getElementById('totalVisitors').textContent = Number(totalCard) || 0;
     document.getElementById('todayVisitors').textContent = Number(todayCard) || 0;
     document.getElementById('monthVisitors').textContent = Number(monthCard) || 0;
     document.getElementById('avgVisitors').textContent   = Number(avgCard)   || 0;
 
-    // 7) CHART – filter berdasar tahun terpilih (agar tahun berganti ⇒ grafik 0)
+    // 7) Chart
     {
-      // Tentukan tahun yang dipakai grafik
       let selectedYear = null;
       if (currentFilters?.date) {
         const d = parsePickedDate(currentFilters.date);
@@ -946,18 +967,43 @@ else if (currentFilters.month && currentFilters.year) {
         selectedYear = new Date().getFullYear();
       }
 
-      // Hitung total pada tahun terpilih
       const msArr = Array.isArray(stats.monthly_stats) ? stats.monthly_stats : [];
       const yearTotalForCharts = msArr
         .filter(it => Number(it.year ?? selectedYear) === Number(selectedYear))
         .reduce((s, it) => s + Number(it.count || 0), 0);
 
-      // Donut tujuan: jika tahun itu kosong ⇒ tampilkan “Tidak ada data”
       createPurposeChart(yearTotalForCharts === 0 ? [] : stats.purpose_stats);
-
-      // Line chart 12 bulan untuk tahun yang dipilih
       createMonthlyChart(stats.monthly_stats, { year: selectedYear });
     }
+
+    // 8) === SEMESTER ===
+    function semesterCountFrom(stats, semester, year) {
+      if (!stats || !Array.isArray(stats.monthly_stats)) return 0;
+      const months = semester === 1 ? [1,2,3,4,5,6] : [7,8,9,10,11,12];
+      return stats.monthly_stats
+        .filter(it => Number(it.year) === year && months.includes(Number(it.month)))
+        .reduce((s, it) => s + Number(it.count || 0), 0);
+    }
+
+    // Update semester statistics
+    const semesterVisitors = document.getElementById('semesterVisitors');
+    const semesterSelect = document.getElementById('semesterSelect');
+    const yearForSemester = now.getFullYear();
+
+    if (semesterVisitors && semesterSelect) {
+      const updateSemesterCard = () => {
+        const selectedSemester = Number(semesterSelect.value);
+        const semTotal = semesterCountFrom(stats, selectedSemester, yearForSemester);
+        semesterVisitors.textContent = semTotal || 0;
+      };
+
+      // Initial load
+      updateSemesterCard();
+
+      // Listen for semester changes
+      semesterSelect.addEventListener('change', updateSemesterCard);
+    }
+
   } catch (err) {
     console.error('Error loading statistics:', err);
   }
@@ -977,22 +1023,43 @@ function createPurposeChart(data) {
     'persandian_keamanan_informasi': 'Persandian & Keamanan Informasi'
   };
 
+  // mapping warna sesuai badge di kanan
+  const colorMap = {
+  'sekretariat': '#8B5CF6',                 
+  'aplikasi_informatika': '#3B82F6',         
+  'informasi_komunikasi_publik': '#F59E0B',  
+  'statistik': '#10B981',                    
+  'persandian_keamanan_informasi': '#EF4444' 
+};
+
+
   const src = Array.isArray(data) ? data : [];
   const labels = src.map(it => purposeMap[it.purpose] ?? (it.purpose ?? 'Tidak diketahui'));
   const counts = src.map(it => Number(it.count ?? 0));
 
   const finalLabels = labels.length ? labels : ['Tidak ada data'];
   const finalCounts = counts.length ? counts : [0];
-  const colors = ['#667eea', '#764ba2', '#f093fb', '#10b981', '#06b6d4'];
+  const finalColors = src.map(it => colorMap[it.purpose] ?? '#D1D5DB'); // fallback abu-abu
 
   purposeChart = new Chart(ctx, {
     type: 'doughnut',
-    data: { labels: finalLabels,
-      datasets: [{ data: finalCounts, backgroundColor: colors.slice(0, finalLabels.length), borderWidth: 0 }]
+    data: {
+      labels: finalLabels,
+      datasets: [{
+        data: finalCounts,
+        backgroundColor: finalColors,
+        borderWidth: 0
+      }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } }
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { padding: 20, usePointStyle: true }
+        }
+      }
     }
   });
 }
