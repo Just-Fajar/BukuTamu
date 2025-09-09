@@ -6,7 +6,7 @@
     <title>Login Admin - Buku Tamu Digital</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
-        * {
+         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, white);
+            background: linear-gradient(135deg, #fffefe); 
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -23,25 +23,13 @@
         }
 
         .login-container {
-            background: white;
-            border: 3px solid #e1e5e9;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: #fff;
+            border-radius: 25px;
+            border: 4px solid #e1e5e9;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             padding: 40px;
             max-width: 400px;
             width: 100%;
-            animation: slideUp 0.6s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .header {
@@ -50,13 +38,10 @@
         }
 
         .header h1 {
-            color: #333;
+            color: #0072ff;
             font-size: 2rem;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-weight: 700;
         }
 
         .header p {
@@ -79,7 +64,7 @@
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             transition: all 0.3s ease;
             background: #f8f9fa;
@@ -87,48 +72,35 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #dbe2e4;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(229, 233, 235, 0.15);
         }
 
         .login-btn {
             width: 100%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
             color: white;
             border: none;
-            padding: 16px;
-            border-radius: 15px;
+            padding: 14px;
+            border-radius: 20px;
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            margin-top: 10px;
+            box-shadow: 0 6px 20px rgba(0,114,255,0.3);
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(0,114,255,0.4);
         }
 
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
         }
 
         .loading {
@@ -139,7 +111,7 @@
 
         .spinner {
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #00c6ff;
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -154,28 +126,27 @@
 
         .back-link {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
         .back-link a {
-            color: #667eea;
+            color: #0072ff;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
         }
 
         .back-link a:hover {
-            color: #764ba2;
+            color: #0056cc;
         }
 
         @media (max-width: 768px) {
             .login-container {
-                padding: 20px;
-                margin: 10px;
+                padding: 25px;
             }
 
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
             }
         }
     </style>
