@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
+               * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -19,12 +19,13 @@
             min-height: 100vh;
         }
 
-        .header {
-            background: linear-gradient(135deg, rgb(181, 192, 239) 0%,rgb(151, 170, 254)  100%);
-            color: white;
-            padding: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+.header {
+  background: linear-gradient(135deg, #5fb9d4, #0077b6);
+  color: white;
+  padding: 20px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
 
         .header-content {
             max-width: 1200px;
@@ -134,6 +135,28 @@
 
         .stat-card.info .number {
             color: #3b82f6;
+        }
+
+        /* Styles for semester card */
+        .stat-card.semester .number {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+.stat-card.semester select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: rgb(207, 204, 204)   /* <-- ini bikin teks dropdown ikut biru */
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+        .stat-card.semester select:focus {
+            outline: none;
         }
 
         .charts-grid {
@@ -536,7 +559,7 @@
   border: none;
   background: transparent;
   font-size: 12px;
-  color: #333;
+  color: #d05d5d;
   cursor: pointer;
 }
 

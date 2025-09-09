@@ -7,32 +7,36 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <style>
-    * {
+       * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, white 0%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* background: url("{{ asset('images/Kabupaten-Madiun.jpg') }}") no-repeat center center fixed; */
+  background-size: cover;
+  min-height: 100vh;
+  margin: 0;
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      border: 3px solid #e1e5e9;
-      padding: 40px;
-      max-width: 600px;
-      width: 100%;
-      animation: slideUp 0.6s ease-out;
-    }
+  display: flex;              /* aktifkan flexbox */
+  justify-content: center;    /* center horizontal */
+  align-items: center;        /* center vertical */
+  padding: 20px;              /* jaga jarak biar di HP gak nempel pinggir */
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 3px solid #e1e5e9;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  animation: slideUp 0.6s ease-out;
+}
+
 
     @keyframes slideUp {
       from {
@@ -50,15 +54,14 @@
       margin-bottom: 30px;
     }
 
-    .header h1 {
-      color: #333;
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+.header h1 {
+  font-size: 2.3rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1c76cf, #769feb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
     .header p {
       color: #666;
@@ -119,7 +122,7 @@
     .form-group select:focus,
     .form-group textarea:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #bec1ce;
       background: white;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
@@ -152,7 +155,7 @@
     }
 
     .btn {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #42a5f5, #1e88e5);
       color: white;
       border: none;
       padding: 12px 24px;
@@ -175,7 +178,7 @@
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg, #f093fb, #f5576c);
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
     }
 
     .btn-success {
@@ -219,17 +222,17 @@
       transition: all 0.3s ease;
       font-weight: 600;
     }
+.purpose-option input[type="radio"]:checked + label {
+  background: linear-gradient(135deg, #42a5f5, #1e88e5);
+  color: white;
+  border-color: #1e88e5;
+  transform: scale(1.05);
+}
 
-    .purpose-option input[type="radio"]:checked + label {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border-color: #667eea;
-      transform: scale(1.05);
-    }
 
     .submit-btn {
       width: 100%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #42a5f5, #1e88e5);
       color: white;
       border: none;
       padding: 16px;
@@ -325,8 +328,8 @@
              loading="eager" decoding="async"
              onerror="this.style.display='none'">
       </div>
-      <h1>Buku Tamu Digital</h1>
-      <p>Selamat datang! Silakan isi data kunjungan Anda</p>
+      <h1>Buku Tamu</h1>
+      <p>Terima kasih telah berkunjung. Silakan isi data kunjungan Anda.</p>
     </div>
 
     <div id="alert-container"></div>
